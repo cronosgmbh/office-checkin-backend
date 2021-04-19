@@ -1,0 +1,27 @@
+service:
+  environment: develop
+  port: 3000
+  log_level: trace
+  task_interval: 15m
+mongodb:
+  host: "localhost"
+  username: "username"
+  password: "password"
+  database: "database"
+  collection: ""
+email:
+  host: "mail.example.com"
+  port: "587"
+  username: "user@example.com"
+  password: "password"
+  from_name: "from name"
+  from_mail: "user@example.com"
+badge:
+  background_color: "#ffffff"
+  foreground_color: "#007aff"
+bookings:
+  auto_delete: yes
+  delete_after_days: 28
+visitors:
+  auto_delete: no
+  delete_after_days: 90

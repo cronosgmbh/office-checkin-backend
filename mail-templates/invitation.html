@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+    <title>Ihr Besuch bei der cronos Unternehmensberatung</title>
+</head>
+<body>
+<p>Hallo {{.Name}}, <br><br>
+    Am {{.Date}} sind Sie zu einem Besuch vor Ort in einem Standort der cronos Unternehmensberatung eingeladen.<br><br>
+    Um die Anmeldung für Sie so einfach wie möglich zu gestalten, bitten wir Sie, die unter dem Link angegebenen Informationen sorgfältig durchzulesen und zu akzeptieren.</p>
+<a href="https://checkin.cronosnet.de/visitor-invitation/{{.VisitID}}">https://checkin.cronosnet.de/visitor-invitation/{{.VisitID}}</a>.
+
+<p>
+    Bei weiteren Fragen steht Ihnen Ihr Ansprechpartner gern zur Verfügung. <br><br>
+    Herzliche Grüße,<br>
+    cronos Unternehmensberatung
+</p>
+</body>
+</html>
