@@ -33,7 +33,7 @@ func deleteOldBookings() {
 	d := time.Now().Add(- age).Format("2006-01-02")
 	logrus.WithField("before_date", d).Info("executing delete old bookings task")
 	filter := bson.M{
-		"date": bson.M{"$lte": "2021-01-15"},
+		"date": bson.M{"$lte": d},
 	}
 	dr, err := client.Database("office_checkin").Collection("bookings").DeleteMany(context.Background(), filter)
 	if err != nil {
