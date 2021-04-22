@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"github.com/kelseyhightower/envconfig"
@@ -11,9 +11,9 @@ import (
 //goland:noinspection ALL
 type Config struct {
 	Service struct {
-		Port        string `yaml:"port", envconfig:"SERVER_PORT"`
-		Environment string `yaml:"environment", envconfig:"SERVER_ENVIRONMENT"`
-		LogLevel    string `yaml:"log_level", envconfig:"SERVER_LOG_LEVEL"`
+		Port         string `yaml:"port", envconfig:"SERVER_PORT"`
+		Environment  string `yaml:"environment", envconfig:"SERVER_ENVIRONMENT"`
+		LogLevel     string `yaml:"log_level", envconfig:"SERVER_LOG_LEVEL"`
 		TaskInterval string `yaml:"task_interval", envconfig:"SERVER_TASK_INTERVAL"`
 	} `yaml:"service"`
 	MongoDB struct {
@@ -36,17 +36,17 @@ type Config struct {
 		ForegroundColor string `yaml:"foreground_color", envconfig:"BADGE_FORE_COLOR"`
 	} `yaml:"badge"`
 	Bookings struct {
-		AutoDelete      bool   `yaml:"auto_delete", envconfig:"BOOKINGS_AUTO_DELETE"`
-		DeleteAfterDays int    `yaml:"delete_after_days", envconfig:"BOOKINGS_DELETE_AFTER_DAYS"`
+		AutoDelete      bool `yaml:"auto_delete", envconfig:"BOOKINGS_AUTO_DELETE"`
+		DeleteAfterDays int  `yaml:"delete_after_days", envconfig:"BOOKINGS_DELETE_AFTER_DAYS"`
 	} `yaml:"bookings"`
 	Visitors struct {
-		AutoDelete	    bool   `yaml:"auto_delete", envconfig:"VISITORS_AUTO_DELETE"`
-		DeleteAfterDays	int    `yaml:"delete_after_days", envconfig:"VISITORS_DELETE_AFTER_DAYS"`
+		AutoDelete      bool `yaml:"auto_delete", envconfig:"VISITORS_AUTO_DELETE"`
+		DeleteAfterDays int  `yaml:"delete_after_days", envconfig:"VISITORS_DELETE_AFTER_DAYS"`
 	} `yaml:"visitors"`
 }
 
 // loadConfig loads the config from config.yaml and env variables
-func loadConfig(cfg *Config) {
+func Load(cfg *Config) {
 	parseFile(cfg)
 }
 

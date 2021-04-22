@@ -22,7 +22,7 @@ func covidBacktracing(c *gin.Context) {
 
 	if !strings.HasSuffix(mail, "@cronos.de") {
 		c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
-			Code:   http.StatusBadRequest,
+			Code: http.StatusBadRequest,
 			Errors: []string{
 				"the mail address must end with @cronos.de",
 			},
@@ -34,7 +34,7 @@ func covidBacktracing(c *gin.Context) {
 	if err != nil {
 		logrus.Info(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
-			Code:   http.StatusBadRequest,
+			Code: http.StatusBadRequest,
 			Errors: []string{
 				"there was an error fetching the user from firebase",
 			},
@@ -42,7 +42,7 @@ func covidBacktracing(c *gin.Context) {
 		return
 	}
 	f := bson.D{{"user", ur.UID}}
-	cur, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), f)
+	cur, err := client.Collection("bookings").Find(context.Background(), f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -51,7 +51,7 @@ func covidBacktracing(c *gin.Context) {
 
 	defer cur.Close(context.Background())
 	var b Booking
-	mind := time.Now().Add(- time.Hour * 24 * 14)
+	mind := time.Now().Add(-time.Hour * 24 * 14)
 	relevantData := make(map[string]string)
 	for cur.Next(context.Background()) {
 		err := cur.Decode(&b)
@@ -59,7 +59,7 @@ func covidBacktracing(c *gin.Context) {
 			logrus.Warn(err)
 			continue
 		}
-		t,err := time.Parse("2006-01-02", b.Date)
+		t, err := time.Parse("2006-01-02", b.Date)
 		if err != nil {
 			logrus.Warn(err)
 			continue
@@ -77,7 +77,7 @@ func covidBacktracing(c *gin.Context) {
 			"area": area,
 		}).Info("fetching data for backtracing")
 		f := bson.D{{"area", area}, {"date", date}}
-		cur, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), f)
+		cur, err := client.Collection("bookings").Find(context.Background(), f)
 		if err != nil {
 			logrus.Error(err)
 			continue
@@ -91,8 +91,8 @@ func covidBacktracing(c *gin.Context) {
 				continue
 			}
 			contactData = append(contactData, BacktracingItem{
-				Date:  date,
-				Email: b.UserName,
+				Date:     date,
+				Email:    b.UserName,
 				AreaName: b.AreaData.Name,
 			})
 		}
@@ -102,7 +102,7 @@ func covidBacktracing(c *gin.Context) {
 		For:       mail,
 		CreatedAt: time.Now().String(),
 		NotBefore: mind.String(),
-		NotAfter: time.Now().String(),
+		NotAfter:  time.Now().String(),
 		Data:      contactData,
 	})
 }

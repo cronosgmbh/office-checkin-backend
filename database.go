@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func connectToDB() *mongo.Client {
+func connectToDB() *mongo.Database {
 	cs := fmt.Sprintf("mongodb+srv://%s:%s@%s/%s?retryWrites=true&w=majority",
 		cfg.MongoDB.Username,
 		cfg.MongoDB.Password,
@@ -22,6 +22,5 @@ func connectToDB() *mongo.Client {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	return client
+	return client.Database(cfg.MongoDB.Database)
 }
-

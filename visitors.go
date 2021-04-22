@@ -36,7 +36,7 @@ type Visit struct {
 	NeedsParkingSpace bool               `json:"needs_parking_space"`
 	User              string             `json:"user"`
 	Supervisor        Supervisor         `json:"supervisor"`
-	HasAccepted		  bool               `json:"has_accepted"`
+	HasAccepted       bool               `json:"has_accepted"`
 }
 
 func addVisitor(c *gin.Context) {
@@ -55,7 +55,7 @@ func addVisitor(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 	defer cancel()
 
-	_, err = client.Database("office_checkin").Collection("visitors").InsertOne(ctx, v)
+	_, err = client.Collection("visitors").InsertOne(ctx, v)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -79,7 +79,7 @@ func getVisitor(c *gin.Context) {
 	f := bson.D{{"_id", pid}}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 	defer cancel()
-	err = client.Database("office_checkin").Collection("visitors").FindOne(ctx, f).Decode(&v)
+	err = client.Collection("visitors").FindOne(ctx, f).Decode(&v)
 	if err != nil {
 		logrus.Error(err)
 		if err == mongo.ErrNoDocuments {
@@ -98,7 +98,7 @@ func getVisitors(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 	f := bson.D{}
-	rows, err := client.Database("office_checkin").Collection("visits").Find(ctx, f)
+	rows, err := client.Collection("visits").Find(ctx, f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -140,7 +140,7 @@ func deleteVisit(c *gin.Context) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	dr, err := client.Database("office_checkin").Collection("visits").DeleteOne(ctx, f)
+	dr, err := client.Collection("visits").DeleteOne(ctx, f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -201,7 +201,7 @@ func addVisit(c *gin.Context) {
 	r.ID = primitive.NewObjectID()
 	r.Visitor.ID = primitive.NewObjectID()
 	r.HasAccepted = false
-	_, err = client.Database("office_checkin").Collection("visits").InsertOne(ctx, r)
+	_, err = client.Collection("visits").InsertOne(ctx, r)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -223,7 +223,7 @@ func getVisits(c *gin.Context) {
 	f := bson.D{{"user", uid}}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	cur, err := client.Database("office_checkin").Collection("visits").Find(ctx, f)
+	cur, err := client.Collection("visits").Find(ctx, f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -260,7 +260,7 @@ func getSingleVisit(c *gin.Context) {
 
 	visit := Visit{}
 
-	err = client.Database("office_checkin").Collection("visits").FindOne(ctx, f).Decode(&visit)
+	err = client.Collection("visits").FindOne(ctx, f).Decode(&visit)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, ErrorResponse{

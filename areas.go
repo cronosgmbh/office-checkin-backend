@@ -16,7 +16,7 @@ func getAreas(c *gin.Context) {
 
 	logrus.Debug("Fetching all areas")
 	filter := bson.D{}
-	cur, err := client.Database("office_checkin").Collection("areas").Find(context.Background(), filter, nil)
+	cur, err := client.Collection("areas").Find(context.Background(), filter, nil)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -44,7 +44,7 @@ func getArea(c *gin.Context) {
 	filter := bson.D{{"_id", objID}}
 
 	area := Area{}
-	err := client.Database("office_checkin").Collection("areas").FindOne(context.Background(), filter).Decode(&area)
+	err := client.Collection("areas").FindOne(context.Background(), filter).Decode(&area)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -60,7 +60,7 @@ func unavailableDates(c *gin.Context) {
 	logrus.WithField("area", a).Debug("looking for fully booked dates for area")
 	f := bson.D{{"area", a}}
 	ad := getAreaFromDB(a)
-	cur, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(),f )
+	cur, err := client.Collection("bookings").Find(context.Background(), f)
 
 	if err != nil {
 		logrus.Error(err)
@@ -122,9 +122,9 @@ func getForecast(c *gin.Context) {
 		}
 	}
 
-	if dif < 1 || dif > 28 * 4 {
+	if dif < 1 || dif > 28*4 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
-			Code:   http.StatusBadRequest,
+			Code: http.StatusBadRequest,
 			Errors: []string{
 				"days-in-future must be in range 1 to 112",
 			},
@@ -135,7 +135,7 @@ func getForecast(c *gin.Context) {
 	ub := make(map[string]bool)
 	uid := c.GetString("userId")
 	filter := bson.D{{"user", uid}}
-	cur, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), filter, nil)
+	cur, err := client.Collection("bookings").Find(context.Background(), filter, nil)
 	if err != nil {
 		logrus.Warn(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -176,8 +176,8 @@ func getForecast(c *gin.Context) {
 
 	for key, value := range forecast {
 		fis = append(fis, ForecastItem{
-			Date:        key,
-			BookedSeats: value,
+			Date:           key,
+			BookedSeats:    value,
 			BookedByMyself: ub[key],
 		})
 	}

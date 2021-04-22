@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cronosgmbh/office-checkin-backend/config"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -8,12 +9,12 @@ import (
 	"net/http"
 )
 
-var client *mongo.Client
-var cfg Config
+var client *mongo.Database
+var cfg config.Config
 
 func main() {
 
-	loadConfig(&cfg)
+	config.Load(&cfg)
 
 	switch cfg.Service.Environment {
 	case "development":
@@ -85,7 +86,6 @@ func main() {
 	user.OPTIONS("")
 	user.GET("", getUser)
 	user.PUT("", updateUser)
-
 
 	users := api.Group("users")
 	users.Use(cors.Default(), authMiddleware())

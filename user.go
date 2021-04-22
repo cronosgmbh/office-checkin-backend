@@ -82,7 +82,7 @@ func updateUser(c *gin.Context) {
 		},
 	}
 	opts := options.Update().SetUpsert(true)
-	_, err := client.Database("office_checkin").Collection("users").UpdateMany(ctx, f, update, opts)
+	_, err := client.Collection("users").UpdateMany(ctx, f, update, opts)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -100,7 +100,7 @@ func getSingleUser(firebaseID string) (u User, err error) {
 	f := bson.D{{"firebaseid", firebaseID}}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	err = client.Database("office_checkin").Collection("users").FindOne(ctx, f).Decode(&u)
+	err = client.Collection("users").FindOne(ctx, f).Decode(&u)
 
 	return
 }

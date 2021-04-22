@@ -27,7 +27,7 @@ func addBooking(c *gin.Context) {
 
 	if br.End != "" && br.Start == "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
-			Code:   http.StatusBadRequest,
+			Code: http.StatusBadRequest,
 			Errors: []string{
 				"you have to provide a start date if providing an end date",
 			},
@@ -37,7 +37,7 @@ func addBooking(c *gin.Context) {
 
 	if br.End == "" && br.Start != "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
-			Code:   http.StatusBadRequest,
+			Code: http.StatusBadRequest,
 			Errors: []string{
 				"you have to provide an end date if providing a start date",
 			},
@@ -63,7 +63,7 @@ func addBooking(c *gin.Context) {
 		if end.Equal(start) {
 			errs = append(errs, "end is equal to start date")
 		}
-		parsingErrorChecking:
+	parsingErrorChecking:
 		if len(errs) > 0 {
 			c.AbortWithStatusJSON(http.StatusBadRequest, ErrorResponse{
 				Code:   http.StatusBadRequest,
@@ -94,7 +94,7 @@ func addBooking(c *gin.Context) {
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute * 2)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 	defer cancel()
 	for _, d := range br.Dates {
 		var booking Booking
@@ -128,7 +128,7 @@ func addBooking(c *gin.Context) {
 		booking.User = fmt.Sprintf("%v", userId)
 		filter := bson.D{{"user", userId}, {"date", booking.Date}}
 		var existingBooking Booking
-		err = client.Database("office_checkin").Collection("bookings").FindOne(ctx, filter).Decode(&existingBooking)
+		err = client.Collection("bookings").FindOne(ctx, filter).Decode(&existingBooking)
 		if err != nil && err != mongo.ErrNoDocuments {
 			logrus.Error(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -138,8 +138,8 @@ func addBooking(c *gin.Context) {
 			un, _ := c.Get("userMail")
 			booking.UserName = fmt.Sprintf("%v", un)
 			aid, _ := primitive.ObjectIDFromHex(booking.Area)
-			err = client.Database("office_checkin").Collection("areas").FindOne(ctx, bson.D{{"_id", aid}}).Decode(&booking.AreaData)
-			_, err = client.Database("office_checkin").Collection("bookings").InsertOne(ctx, booking)
+			err = client.Collection("areas").FindOne(ctx, bson.D{{"_id", aid}}).Decode(&booking.AreaData)
+			_, err = client.Collection("bookings").InsertOne(ctx, booking)
 			if err != nil {
 				logrus.Error(err)
 				c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -163,7 +163,7 @@ func getBookings(c *gin.Context) {
 	ufc, _ := c.Get("userId")
 	uid := fmt.Sprintf("%v", ufc)
 	filter := bson.D{{"user", uid}}
-	cur, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), filter, nil)
+	cur, err := client.Collection("bookings").Find(context.Background(), filter, nil)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -179,7 +179,7 @@ func getBookings(c *gin.Context) {
 		}
 		booking.ID = cur.Current.Lookup("_id").ObjectID().Hex()
 		aid, _ := primitive.ObjectIDFromHex(booking.Area)
-		err = client.Database("office_checkin").Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
+		err = client.Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
 		if err != nil {
 			logrus.Error(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -209,7 +209,7 @@ func deleteBooking(c *gin.Context) {
 		return
 	}
 	f := bson.D{{"_id", pbid}, {"user", uid}}
-	r, err := client.Database("office_checkin").Collection("bookings").DeleteOne(context.Background(), f)
+	r, err := client.Collection("bookings").DeleteOne(context.Background(), f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -233,7 +233,7 @@ func adminGetBookings(c *gin.Context) {
 	logrus.Debug("getting all bookings for admin dashboard")
 	var bookings []Booking
 	f := bson.D{}
-	cursor, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), f)
+	cursor, err := client.Collection("bookings").Find(context.Background(), f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorResponse{
@@ -251,7 +251,7 @@ func adminGetBookings(c *gin.Context) {
 		}
 		booking.ID = cursor.Current.Lookup("_id").ObjectID().Hex()
 		aid, _ := primitive.ObjectIDFromHex(booking.Area)
-		err = client.Database("office_checkin").Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
+		err = client.Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
 		bookings = append(bookings, booking)
 	}
 	c.JSON(http.StatusOK, bookings)
@@ -273,7 +273,7 @@ func adminGetBookingsForDate(c *gin.Context) {
 		return
 	}
 	f := bson.D{{"date", date}}
-	cursor, err := client.Database("office_checkin").Collection("bookings").Find(context.Background(), f)
+	cursor, err := client.Collection("bookings").Find(context.Background(), f)
 	if err != nil {
 		logrus.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ErrorInternalError)
@@ -289,17 +289,17 @@ func adminGetBookingsForDate(c *gin.Context) {
 		}
 		booking.ID = cursor.Current.Lookup("_id").ObjectID().Hex()
 		aid, _ := primitive.ObjectIDFromHex(booking.Area)
-		err = client.Database("office_checkin").Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
+		err = client.Collection("areas").FindOne(context.Background(), bson.D{{"_id", aid}}).Decode(&booking.AreaData)
 		bookings = append(bookings, booking)
 	}
 
 	v := getVisitorBookingsForDate(date)
 
 	c.JSON(http.StatusOK, struct {
-		Visits []Visit `json:"visits"`
+		Visits   []Visit   `json:"visits"`
 		Bookings []Booking `json:"bookings"`
 	}{
-		Visits: v,
+		Visits:   v,
 		Bookings: bookings,
 	})
 }

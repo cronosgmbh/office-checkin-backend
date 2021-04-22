@@ -66,7 +66,7 @@ func acceptInvitation(c *gin.Context) {
 			HasAccepted bool
 		}{HasAccepted: true},
 	}
-	if _, err := client.Database("office_checkin").Collection("visits").UpdateOne(ctx, f, update); err != nil {
+	if _, err := client.Collection("visits").UpdateOne(ctx, f, update); err != nil {
 		logrus.Error(err)
 		c.JSON(http.StatusInternalServerError, ErrorInternalError)
 		return
@@ -93,7 +93,7 @@ func resendMail(c *gin.Context) {
 
 	visit := Visit{}
 
-	err = client.Database("office_checkin").Collection("visits").FindOne(ctx, f).Decode(&visit)
+	err = client.Collection("visits").FindOne(ctx, f).Decode(&visit)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusNotFound, ErrorResponse{
